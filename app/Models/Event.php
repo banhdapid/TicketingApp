@@ -40,25 +40,29 @@ class Event extends Model
         return 'Completed';
     }
 
-    public function getImageUrlAttribute()
+public function getImageUrlAttribute()
     {
-        $url = $this->url;
+        //panggil kolom 'gambar'
+        $url = $this->gambar; 
 
-        //Cek apakah kolom gambar kosong (null / empty string)
+        // Cek apakah kolom gambar kosong (null / empty string)
         if (empty($url)) {
-            // Sesuaikan path 'konser.jpg' dengan lokasi file fallback di folder public-mu
-            return asset('konser.jpg'); 
+            // Karena konser.jpg ada di storage/app/public, kita gunakan Storage::url
+            return \Illuminate\Support\Facades\Storage::url('konser.jpg');
         }
-        //Cek apakah format teksnya adalah URL penuh yang valid (misal: S3 Amazon atau link eksternal)
+
+        // Cek apakah format teksnya adalah URL penuh yang valid (eksternal/S3)
         if (filter_var($url, FILTER_VALIDATE_URL)) {
             return $url;
         }
-        //Cek apakah file fisik tersebut ada di folder storage lokal Laravel (disk 'public')
+
+        // Cek apakah file fisik tersebut ada di folder storage lokal
         if (\Illuminate\Support\Facades\Storage::disk('public')->exists($url)) {
-            // Storage::url() otomatis men-generate link seperti: http://localhost:8000/storage/namafile.jpg
             return \Illuminate\Support\Facades\Storage::url($url);
         }
-        return asset('konser.jpg');
+
+        // Fallback terakhir jika nama gambar tercatat di DB tapi file fisiknya terhapus
+        return \Illuminate\Support\Facades\Storage::url('konser.jpg');
     }
 
     public function hasSales(): bool
