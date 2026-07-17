@@ -119,6 +119,31 @@
             </div>
         @endif
 
+        {{-- Section: Event Terkait --}}
+        <div class="mt-16 border-t pt-10">
+            <h3 class="text-2xl font-bold mb-6 text-gray-800">Event Terkait</h3>
+            
+            {{-- Grid 4 Columns menggunakan Tailwind CSS --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                @forelse($relatedEvents as $related)
+                    {{-- Menggunakan komponen x-event-card --}}
+                <x-event-card 
+                    :title="$related->judul"
+                    :category="$related->kategori->nama ?? 'Umum'"
+                    :date="$related->tanggal_waktu"
+                    :location="$related->lokasi"
+                    :image="$related->image_url"
+                    :price="$related->tikets->min('harga') ?? 0"
+                    :href="route('events.show', $related->id)"
+                />
+                @empty
+                    <div class="col-span-full py-8 text-center bg-gray-50 rounded-box border border-dashed border-gray-300">
+                        <p class="text-gray-500 font-medium">Belum ada event serupa dalam waktu dekat.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
         <!-- Back Button -->
         <div class="mt-8">
             <a href="{{ route('home') }}" class="btn btn-outline btn-wide">
